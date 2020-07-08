@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Item from './Item';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -10,11 +11,8 @@ function App() {
       ? setTodos([{ name: items, completed: false }, ...todos])
       : alert('Please enter an item');
 
-    console.log(todos);
-  }
-  function toggleClass(e, x) {
-    e.target.classList.toggle('complete');
-    const usr = [x];
+    setItems('');
+    //console.log(todos);
   }
 
   return (
@@ -31,6 +29,7 @@ function App() {
         <input
           type="text"
           onChange={(event) => setItems(event.target.value)}
+          value={items}
           className="todo-input"
           placeholder="Add item..."
         />
@@ -44,21 +43,47 @@ function App() {
       </form>
 
       <ul className="todo-list">
-        {todos.map((todo) => (
-          <li className={todo.completed ? 'complete' : 'uncompleted'}>
-            <button onClick={() => toggleClass(EventTarget)} className="done">
-              &#10003;
-            </button>
-            <span>{todo.name}</span>
-            <button className="delete">&#128465;</button>
-          </li>
+        {todos.map((todo, index) => (
+          <Item
+            todo={todo}
+            toggleCompleted={() => {
+              const updatedItem = { ...todo, completed: !todo.completed };
+              setTodos([
+                ...todos.slice(0, index),
+                updatedItem,
+                ...todos.slice(index + 1),
+              ]);
+            }}
+            deleteTodo={() => {
+              setTodos([...todos.slice(0, index), ...todos.slice(index + 1)]);
+            }}
+          />
         ))}
       </ul>
 
       <div className="actions">
-        <div className="left total">1 items remaining</div>
+        <div className="left total">
+          {' '}
+          {
+            todos.filter(function (s) {
+              return !s.completed;
+            }).length
+          }{' '}
+          items remaining
+        </div>
         <div className="right">
-          <button className="delete-complete">Delete completed items</button>
+          <button
+            className="delete-complete"
+            onClick={() => {
+              setTodos(
+                todos.filter(function (s) {
+                  return !s.completed;
+                })
+              );
+            }}
+          >
+            Delete completed items
+          </button>
         </div>
       </div>
     </div>
